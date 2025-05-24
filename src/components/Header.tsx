@@ -1,45 +1,40 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
+import SearchBar from './SearchBar'
 import './Header.css'
 
 const Header = () => {
-  const [searchQuery, setSearchQuery] = useState('')
-  const navigate = useNavigate()
+  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (searchQuery.trim()) {
-      navigate(`/recherche?q=${encodeURIComponent(searchQuery.trim())}`)
-      setSearchQuery('')
-    }
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen)
+  }
+
+  const closeMenu = () => {
+    setIsMenuOpen(false)
   }
 
   return (
     <header className="header">
       <div className="header-content">
-        <Link to="/" className="logo">
+        <Link to="/" className="logo" onClick={closeMenu}>
           CinéTech
         </Link>
         
-        <div className="search-container">
-          <form className="search-form" onSubmit={handleSearch}>
-            <input
-              type="text"
-              className="search-input"
-              placeholder="Rechercher un film ou une série..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button type="submit" className="search-button">
-              Rechercher
-            </button>
-          </form>
+        <div className="search-wrapper">
+          <SearchBar onSearch={closeMenu} />
         </div>
 
-        <nav className="nav">
-          <Link to="/" className="nav-link">Accueil</Link>
-          <Link to="/films" className="nav-link">Films</Link>
-          <Link to="/series" className="nav-link">Séries</Link>
+        <button className="menu-toggle" onClick={toggleMenu}>
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+
+        <nav className={`nav ${isMenuOpen ? 'nav-open' : ''}`}>
+          <Link to="/" className="nav-link" onClick={closeMenu}>Accueil</Link>
+          <Link to="/films" className="nav-link" onClick={closeMenu}>Films</Link>
+          <Link to="/series" className="nav-link" onClick={closeMenu}>Séries</Link>
         </nav>
       </div>
     </header>
