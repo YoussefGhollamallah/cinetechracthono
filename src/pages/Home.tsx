@@ -62,20 +62,26 @@ const Home = () => {
         <h2>Tendances</h2>
         <div className="media-grid">
           {popularMedia.map((media) => (
-            <Link
-              to={`/${media.media_type}/${media.id}`}
-              key={media.id}
-              className="media-card"
-            >
-              <img
-                src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
-                alt={media.title || media.name}
-              />
+            <div key={media.id} className="media-card">
+              <Link
+                to={`/${media.media_type}/${media.id}`}
+                className="media-poster-link"
+              >
+                <img
+                  src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
+                  alt={media.title || media.name}
+                />
+              </Link>
               <div className="media-info">
                 <h3>{media.title || media.name}</h3>
-                <p>{media.overview.substring(0, 100)}...</p>
+                <Link
+                  to={`/${media.media_type}/${media.id}`}
+                  className="details-button"
+                >
+                  Voir les détails
+                </Link>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       </section>
