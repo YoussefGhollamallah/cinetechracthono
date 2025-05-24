@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Movies from './pages/Movies'
 import Series from './pages/Series'
 import Search from './pages/Search'
+import Details from './pages/Details'
 import './App.css'
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
             <Route path="/films" element={<Movies />} />
             <Route path="/series" element={<Series />} />
             <Route path="/recherche" element={<Search />} />
+            <Route path="/:type/:id" element={<Details />} />
           </Routes>
         </main>
         <Footer />
