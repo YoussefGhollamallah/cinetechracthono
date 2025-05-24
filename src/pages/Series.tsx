@@ -43,28 +43,27 @@ const Series = () => {
 
   return (
     <div className="series-page">
-      <h1>Séries Populaires</h1>
+      <div className="page-header">
+        <h1>Séries Populaires</h1>
+        <p>Découvrez les séries les plus populaires du moment</p>
+      </div>
       
       <div className="series-grid">
         {series.map((show) => (
-          <Link to={`/tv/${show.id}`} key={show.id} className="series-card">
-            <img
-              src={`https://image.tmdb.org/t/p/w500${show.poster_path}`}
-              alt={show.name}
-            />
+          <div key={show.id} className="series-card">
+            <Link to={`/tv/${show.id}`} className="series-poster-link">
+              <img
+                src={`https://image.tmdb.org/t/p/w500${show.poster_path}`}
+                alt={show.name}
+              />
+            </Link>
             <div className="series-info">
               <h2>{show.name}</h2>
-              <div className="series-meta">
-                <span className="air-date">
-                  {new Date(show.first_air_date).getFullYear()}
-                </span>
-                <span className="rating">
-                  ★ {show.vote_average.toFixed(1)}
-                </span>
-              </div>
-              <p>{show.overview.substring(0, 100)}...</p>
+              <Link to={`/tv/${show.id}`} className="details-button">
+                Voir les détails
+              </Link>
             </div>
-          </Link>
+          </div>
         ))}
       </div>
 
@@ -72,12 +71,16 @@ const Series = () => {
         <button
           onClick={() => setPage(p => Math.max(1, p - 1))}
           disabled={page === 1}
+          className="pagination-button"
         >
-          Précédent
+          ← Précédent
         </button>
-        <span>Page {page}</span>
-        <button onClick={() => setPage(p => p + 1)}>
-          Suivant
+        <span className="page-info">Page {page}</span>
+        <button 
+          onClick={() => setPage(p => p + 1)}
+          className="pagination-button"
+        >
+          Suivant →
         </button>
       </div>
     </div>
