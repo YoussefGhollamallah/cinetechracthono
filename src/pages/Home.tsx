@@ -16,27 +16,46 @@ interface Media {
 }
 
 const Home = () => {
-  const [popularMedia, setPopularMedia] = useState<Media[]>([])
+  const [popularMovies, setPopularMovies] = useState<Media[]>([])
+  const [popularSeries, setPopularSeries] = useState<Media[]>([])
+  const [trendingMovies, setTrendingMovies] = useState<Media[]>([])
+  const [trendingSeries, setTrendingSeries] = useState<Media[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const fetchPopularMedia = async () => {
+    const fetchAllMedia = async () => {
       try {
-        const [moviesResponse, seriesResponse] = await Promise.all([
+        const [popularMoviesRes, popularSeriesRes, trendingMoviesRes, trendingSeriesRes] = await Promise.all([
           axios.get(`${TMDB_BASE_URL}/movie/popular?api_key=${TMDB_API_KEY}&language=fr-FR`),
-          axios.get(`${TMDB_BASE_URL}/tv/popular?api_key=${TMDB_API_KEY}&language=fr-FR`)
+          axios.get(`${TMDB_BASE_URL}/tv/popular?api_key=${TMDB_API_KEY}&language=fr-FR`),
+          axios.get(`${TMDB_BASE_URL}/trending/movie/week?api_key=${TMDB_API_KEY}&language=fr-FR`),
+          axios.get(`${TMDB_BASE_URL}/trending/tv/week?api_key=${TMDB_API_KEY}&language=fr-FR`)
         ])
 
-        const movies = moviesResponse.data.results.map((movie: any) => ({
+        const movies = popularMoviesRes.data.results.slice(0, 8).map((movie: any) => ({
           ...movie,
           media_type: 'movie'
         }))
-        const series = seriesResponse.data.results.map((show: any) => ({
+        
+        const series = popularSeriesRes.data.results.slice(0, 8).map((show: any) => ({
           ...show,
           media_type: 'tv'
         }))
 
-        setPopularMedia([...movies, ...series].sort(() => Math.random() - 0.5).slice(0, 12))
+        const trendingMoviesData = trendingMoviesRes.data.results.slice(0, 8).map((movie: any) => ({
+          ...movie,
+          media_type: 'movie'
+        }))
+
+        const trendingSeriesData = trendingSeriesRes.data.results.slice(0, 8).map((show: any) => ({
+          ...show,
+          media_type: 'tv'
+        }))
+
+        setPopularMovies(movies)
+        setPopularSeries(series)
+        setTrendingMovies(trendingMoviesData)
+        setTrendingSeries(trendingSeriesData)
         setLoading(false)
       } catch (error) {
         console.error('Erreur lors de la récupération des médias:', error)
@@ -44,8 +63,38 @@ const Home = () => {
       }
     }
 
-    fetchPopularMedia()
+    fetchAllMedia()
   }, [])
+
+  const renderMediaSection = (title: string, mediaList: Media[]) => (
+    <section className="media-section">
+      <h2>{title}</h2>
+      <div className="media-grid">
+        {mediaList.map((media) => (
+          <div key={media.id} className="media-card">
+            <Link
+              to={`/${media.media_type}/${media.id}`}
+              className="media-poster-link"
+            >
+              <img
+                src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
+                alt={media.title || media.name}
+              />
+            </Link>
+            <div className="media-info">
+              <h3>{media.title || media.name}</h3>
+              <Link
+                to={`/${media.media_type}/${media.id}`}
+                className="details-button"
+              >
+                Voir les détails
+              </Link>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
 
   if (loading) {
     return <div className="loading">Chargement...</div>
@@ -58,33 +107,10 @@ const Home = () => {
         <p>Découvrez les meilleurs films et séries du moment</p>
       </section>
 
-      <section className="popular-media">
-        <h2>Tendances</h2>
-        <div className="media-grid">
-          {popularMedia.map((media) => (
-            <div key={media.id} className="media-card">
-              <Link
-                to={`/${media.media_type}/${media.id}`}
-                className="media-poster-link"
-              >
-                <img
-                  src={`https://image.tmdb.org/t/p/w500${media.poster_path}`}
-                  alt={media.title || media.name}
-                />
-              </Link>
-              <div className="media-info">
-                <h3>{media.title || media.name}</h3>
-                <Link
-                  to={`/${media.media_type}/${media.id}`}
-                  className="details-button"
-                >
-                  Voir les détails
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
+      {renderMediaSection("Films Populaires", popularMovies)}
+      {renderMediaSection("Séries Populaires", popularSeries)}
+      {renderMediaSection("Films Tendance", trendingMovies)}
+      {renderMediaSection("Séries Tendance", trendingSeries)}
     </div>
   )
 }
